@@ -1,0 +1,61 @@
+### 1. Отримання JWT-токена для звичайного користувача (user1 / Роль: USER)
+# @name loginUser
+POST http://localhost:8081/realms/animal-realm/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+client_id=animal-client&client_secret=URTaSvSsNlypca2ydkawtxwyeWC1j8pg&grant_type=password&username=user1&password=user123
+
+### 2. Отримання JWT-токена для адміністратора (admin1 / Роль: ADMIN)
+# @name loginAdmin
+POST http://localhost:8081/realms/animal-realm/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+client_id=animal-client&client_secret=URTaSvSsNlypca2ydkawtxwyeWC1j8pg&grant_type=password&username=admin1&password=admin123
+
+### 3. Перевірка без токена
+GET http://localhost:8080/api/animals
+Accept: application/json
+
+### 4. (AC 5 + AC 1) Читання всіх тварин із JWT токеном юзер
+GET http://localhost:8080/api/animals
+Authorization: Bearer {{loginUser.response.body.access_token}}
+
+### 5. (AC 1) Створення нової тварини (POST) із JWT токеном юзер
+POST http://localhost:8080/api/animals
+Authorization: Bearer {{loginUser.response.body.access_token}}
+Content-Type: application/json
+
+{
+  "name": "Багіра",
+  "species": "Пантера чорна",
+  "age": 4,
+  "habitat": "Джунглі"
+}
+
+### 6. (AC 1) Оновлення тварини (PUT) із JWT токеном юзер
+PUT http://localhost:8080/api/animals/6
+Authorization: Bearer {{loginUser.response.body.access_token}}
+Content-Type: application/json
+
+{
+  "name": "Сімба Король",
+  "species": "Лев африканський",
+  "age": 6,
+  "habitat": "Савана Прайду"
+}
+
+### 7. (AC 6) Перевірка обмеження SecurityFilterChain юзер
+GET http://localhost:8080/api/admin/stats
+Authorization: Bearer {{loginUser.response.body.access_token}}
+
+### 8. (AC 6) Перевірка обмеження SecurityFilterChain адмін
+GET http://localhost:8080/api/admin/stats
+Authorization: Bearer {{loginAdmin.response.body.access_token}}
+
+### 9. (AC 7) Перевірка @PreAuthorize (DELETE) юзер
+DELETE http://localhost:8080/api/animals/2
+Authorization: Bearer {{loginUser.response.body.access_token}}
+
+### 10. (AC 7) Перевірка @PreAuthorize (DELETE) з роллю адмін
+DELETE http://localhost:8080/api/animals/localhost:8080/api/animals/6
+Authorization: Bearer {{loginAdmin.response.body.access_token}}

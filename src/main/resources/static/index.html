@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Облік Тварин — Лабораторна №1</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 25px auto; padding: 0 15px; }
+        .bar { background: #f3f4f6; padding: 12px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        form { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+        input, button { padding: 8px 10px; font-size: 14px; }
+        button { cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background: #eee; }
+        #msg { margin: 10px 0; padding: 10px; border-radius: 4px; display: none; }
+    </style>
+</head>
+<body>
+
+<h2>Система обліку тварин (Spring Security: OIDC + JWT)</h2>
+
+<div class="bar">
+    <div id="userInfo">Завантаження користувача...</div>
+    <div>
+        <button onclick="checkAdminStats()">Перевірити /api/admin/stats (FilterChain)</button>
+        <a href="/logout"><button type="button">Вийти</button></a>
+    </div>
+</div>
+
+<div id="msg"></div>
+
+<form id="animalForm" onsubmit="saveAnimal(event)">
+    <input type="hidden" id="animalId">
+    <input type="text" id="name" placeholder="Кличка (напр. Рекс)" required>
+    <input type="text" id="species" placeholder="Вид (напр. Вовк)" required>
+    <input type="number" id="age" placeholder="Вік" min="0" required style="width: 80px;">
+    <input type="text" id="habitat" placeholder="Середовище (напр. Ліс)" required>
+    <button type="submit" id="submitBtn">Додати тварину</button>
+    <button type="button" onclick="resetForm()">Очистити</button>
+</form>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Кличка</th>
+        <th>Вид</th>
+        <th>Вік</th>
+        <th>Середовище проживання</th>
+        <th>Дії</th>
+    </tr>
+    </thead>
+    <tbody id="animalsTable"></tbody>
+</table>
+
+<script>
+    function showMessage(text, isError = false) {
+        const el = document.getElementById('msg');
+        el.style.display = 'block';
+        el.style.background = isError ? '#fee2e2' : '#dcfce7';
+        el.style.color = isError ? '#991b1b' : '#166534';
+        el.innerText = text;
+    }
+
+    async function loadUser() {
+        const res = await fetch('/api/me');
+        const data = await res.json();
+        if (data.authenticated) {
+            document.getElementById('userInfo').innerText =
+                `Користувач: ${data.username} | Ролі: ${data.roles.join(', ')}`;
+        }
+    }
+
+    async function loadAnimals() {
+        const res = await fetch('/api/animals');
+        if (!res.ok) return;
+        const animals = await res.json();
+        const tbody = document.getElementById('animalsTable');
+        tbody.innerHTML = '';
+        animals.forEach(a => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${a.id}</td>
+                    <td>${a.name}</td>
+                    <td>${a.species}</td>
+                    <td>${a.age}</td>
+                    <td>${a.habitat}</td>
+                    <td>
+                        <button onclick='editAnimal(${JSON.stringify(a)})'>Редагувати</button>
+                        <button onclick="deleteAnimal(${a.id})">Видалити (@PreAuthorize ADMIN)</button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    async function saveAnimal(e) {
+        e.preventDefault();
+        const id = document.getElementById('animalId').value;
+        const payload = {
+            name: document.getElementById('name').value,
+            species: document.getElementById('species').value,
+            age: parseInt(document.getElementById('age').value, 10),
+            habitat: document.getElementById('habitat').value
+        };
+
+        const url = id ? `/api/animals/${id}` : '/api/animals';
+        const method = id ? 'PUT' : 'POST';
+
+        const res = await fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+            showMessage(id ? 'Тварину оновлено!' : 'Тварину створено!');
+            resetForm();
+            loadAnimals();
+        } else {
+            showMessage(`Помилка збереження: HTTP ${res.status}`, true);
+        }
+    }
+
+    function editAnimal(a) {
+        document.getElementById('animalId').value = a.id;
+        document.getElementById('name').value = a.name;
+        document.getElementById('species').value = a.species;
+        document.getElementById('age').value = a.age;
+        document.getElementById('habitat').value = a.habitat;
+        document.getElementById('submitBtn').innerText = 'Зберегти зміни';
+    }
+
+    function resetForm() {
+        document.getElementById('animalId').value = '';
+        document.getElementById('animalForm').reset();
+        document.getElementById('submitBtn').innerText = 'Додати тварину';
+    }
+
+    async function deleteAnimal(id) {
+        const res = await fetch(`/api/animals/${id}`, { method: 'DELETE' });
+        if (res.status === 204) {
+            showMessage(`Тварину ID=${id} успішно видалено!`);
+            loadAnimals();
+        } else if (res.status === 403) {
+            showMessage('403 Forbidden: Метод заблоковано @PreAuthorize("hasRole(\'ADMIN\')")!', true);
+        } else {
+            showMessage(`Помилка: HTTP ${res.status}`, true);
+        }
+    }
+
+    async function checkAdminStats() {
+        const res = await fetch('/api/admin/stats');
+        if (res.ok) {
+            const data = await res.json();
+            showMessage(`${data.status}. Всього тварин у базі: ${data.totalAnimals}`);
+        } else if (res.status === 403) {
+            showMessage('403 Forbidden: Доступ заблоковано правилом у SecurityFilterChain!', true);
+        }
+    }
+
+    loadUser();
+    loadAnimals();
+</script>
+</body>
+</html>
