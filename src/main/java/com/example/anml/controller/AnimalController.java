@@ -2,9 +2,11 @@ package com.example.anml.controller;
 
 import com.example.anml.dto.AnimalDto;
 import com.example.anml.service.AnimalService;
+import com.example.anml.web.CurrentUser;
+import com.example.anml.web.CurrentUserInfo;
+import com.example.anml.web.PostCreatedMapping;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,14 +32,13 @@ public class AnimalController {
         return animalService.findById(id);
     }
 
-    @PostMapping("/animals")
-    @ResponseStatus(HttpStatus.CREATED)
-    public AnimalDto create(@RequestBody AnimalDto dto) {
+    @PostCreatedMapping("/animals")
+    public AnimalDto create(@Valid @RequestBody AnimalDto dto) {
         return animalService.create(dto);
     }
 
     @PutMapping("/animals/{id}")
-    public AnimalDto update(@PathVariable Long id, @RequestBody AnimalDto dto) {
+    public AnimalDto update(@PathVariable Long id, @Valid @RequestBody AnimalDto dto) {
         return animalService.update(id, dto);
     }
 
@@ -49,26 +50,22 @@ public class AnimalController {
 
     // Ендпоінт, доступ до якого обмежено на рівні SecurityFilterChain (Acceptance Criteria 6)
     @GetMapping("/admin/stats")
-    public Map<String, Object> getAdminStats() {
+    public Map<String, Object> getAdminStats(@CurrentUser CurrentUserInfo currentUser) {
         return Map.of(
                 "status", "Доступ дозволено (рівень SecurityFilterChain: тільки ADMIN)",
-                "totalAnimals", animalService.count()
+                "totalAnimals", animalService.count(),
+                "requestedBy", currentUser.username(),
+                "roles", currentUser.roles()
         );
     }
 
     // Допоміжний ендпоінт для UI, щоб показати ім'я користувача та його ролі
     @GetMapping("/me")
-    public Map<String, Object> getCurrentUser(Authentication authentication) {
-        if (authentication == null) {
-            return Map.of("authenticated", false);
-        }
-        List<String> roles = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
+    public Map<String, Object> getCurrentUser(@CurrentUser CurrentUserInfo currentUser) {
         return Map.of(
-                "authenticated", true,
-                "username", authentication.getName(),
-                "roles", roles
+                "authenticated", currentUser.authenticated(),
+                "username", currentUser.username(),
+                "roles", currentUser.roles()
         );
     }
 }
