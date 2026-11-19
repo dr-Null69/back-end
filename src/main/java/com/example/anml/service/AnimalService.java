@@ -10,6 +10,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.example.anml.aop.NormalizeAnimalOutput;
+import com.example.anml.aop.RateLimit;
+import com.example.anml.aop.RetryOnFailure;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -25,6 +29,7 @@ public class AnimalService {
         this.animalMapper = animalMapper;
     }
 
+    @RetryOnFailure(maxAttempts = 3)
     @Transactional(readOnly = true)
     public List<AnimalDto> findAll() {
         List<Animal> animals = animalRepository.findAll();
@@ -36,6 +41,7 @@ public class AnimalService {
                 .toList();
     }
 
+    @NormalizeAnimalOutput
     @Transactional(readOnly = true)
     public AnimalDto findById(Long id) {
         if (id == null || id <= 0) {
@@ -44,6 +50,10 @@ public class AnimalService {
         Animal animal = animalRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Тварину з id=" + id + " не знайдено"));
         return animalMapper.toDto(animal);
+    }
+    @Transactional(readOnly = true)
+    public AnimalDto findByIdViaSelfInvocation(Long id) {
+        return this.findById(id);
     }
 
     public AnimalDto create(AnimalDto dto) {
@@ -76,7 +86,7 @@ public class AnimalService {
         }
         animalRepository.deleteById(id);
     }
-
+    @RateLimit(maxCalls = 3, windowSeconds = 60, key = "animal-stats-count")
     @Transactional(readOnly = true)
     public long count() {
         long total = animalRepository.count();
