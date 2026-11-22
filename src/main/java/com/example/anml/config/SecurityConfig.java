@@ -46,7 +46,6 @@ public class SecurityConfig {
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
                 )
                 .logout(logout -> logout
-                        // Використовуємо лямбду замість AntPathRequestMatcher
                         .logoutRequestMatcher(request -> request.getRequestURI().endsWith("/logout"))
                         .logoutSuccessHandler(oidcLogoutSuccessHandler(clientRegistrationRepository))
                         .permitAll()

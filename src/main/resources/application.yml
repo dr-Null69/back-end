@@ -36,3 +36,21 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8081/realms/animal-realm
+  quartz:
+    job-store-type: jdbc
+    overwrite-existing-jobs: true
+    wait-for-jobs-to-complete-on-shutdown: true
+    jdbc:
+      initialize-schema: never
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceName: AnmlQuartzScheduler
+            instanceId: AUTO
+          jobStore:
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+            tablePrefix: QRTZ_
+            useProperties: false
+          threadPool:
+            threadCount: 5

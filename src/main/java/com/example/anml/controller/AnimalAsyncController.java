@@ -13,11 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
-/**
- * REST-ендпоінти для демонстрації асинхронної обробки:
- * - POST /api/animals/{id}/notify — fire-and-forget (202 Accepted)
- * - GET  /api/animals/{id}/dossier — паралельне об'єднання 2 асинхронних викликів
- */
 @RestController
 @RequestMapping("/api/animals")
 public class AnimalAsyncController {

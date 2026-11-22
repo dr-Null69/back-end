@@ -1,3 +1,5 @@
 databaseChangeLog:
   - include:
       file: db/changelog/001-create-animals-table.sql
+  - include:
+      file: db/changelog/002-create-quartz-tables.sql

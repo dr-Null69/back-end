@@ -8,10 +8,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-/**
- * Аспект, який трансформує повернений {@link AnimalDto} або список {@link AnimalDto}
- * для методів, позначених {@link NormalizeAnimalOutput}.
- */
 @Aspect
 @Component
 public class NormalizeAnimalOutputAspect {

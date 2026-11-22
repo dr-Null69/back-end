@@ -74,7 +74,6 @@ class AnimalAsyncProcessingTest {
         when(animalService.findById(1L)).thenReturn(sampleLion);
     }
 
-    // Сценарій 1: Повільний метод більше не блокує викликаючий код
     @Test
     void fireAndForget_returnsImmediatelyBeforeSlowNotificationCompletes_andRunsOnCustomExecutor() throws Exception {
         CountDownLatch completionLatch = new CountDownLatch(1);
@@ -95,7 +94,6 @@ class AnimalAsyncProcessingTest {
         assertNotEquals(callerThread, sent.get(0).threadName());
     }
 
-    // Сценарій 2: Виконавець є явно визначеним і має обмежені ресурси
     @Test
     void executor_isExplicitlyBounded_andAsyncMethodUsesCustomThreadPrefix() throws Exception {
         assertEquals(2, animalTaskExecutor.getCorePoolSize());
@@ -111,7 +109,6 @@ class AnimalAsyncProcessingTest {
         assertFalse(vetCheck.threadName().contains("SimpleAsyncTaskExecutor"));
     }
 
-    // Сценарій 3: Два незалежні виклики справді виконуються одночасно
     @Test
     void twoIndependentAsyncCalls_executeConcurrently_andCombineResults() {
         long startNanos = System.nanoTime();
@@ -133,7 +130,6 @@ class AnimalAsyncProcessingTest {
                 "Паралельне виконання двох задач по 450 мс має займати < 800 мс (фактично: " + elapsedMs + " мс)");
     }
 
-    // Сценарій 4 (частина 1): Помилка в CompletableFuture обробляється через exceptionally / handle
     @Test
     void failedCompletableFuture_isHandledWithFallback_withoutFailingCaller() {
         AnimalDossierDto vetFallbackDossier = animalDossierService.buildAnimalDossier(
@@ -151,7 +147,6 @@ class AnimalAsyncProcessingTest {
         assertTrue(habitatFallbackDossier.habitatReport().conditionSummary().contains("fallback"));
     }
 
-    // Сценарій 4 (частина 2): Помилка у void @Async фіксується через AsyncUncaughtExceptionHandler
     @Test
     void failedVoidAsyncMethod_isCapturedByAsyncUncaughtExceptionHandler() throws Exception {
         CountDownLatch completionLatch = new CountDownLatch(1);
@@ -168,7 +163,6 @@ class AnimalAsyncProcessingTest {
         assertTrue(errors.get(0).threadName().startsWith(AsyncConfig.THREAD_NAME_PREFIX));
     }
 
-    // Сценарій 5: Очікування завжди обмежене в часі (тайм-аут)
     @Test
     void slowFutureExceedingTimeout_stopsWaitingWithAsyncTimeoutException() {
         long startNanos = System.nanoTime();

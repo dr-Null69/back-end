@@ -7,10 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-/**
- * Аспект, який перехоплює методи з {@link RetryOnFailure} і повторює їхнє виконання
- * у разі виникнення дозволених тимчасових винятків.
- */
 @Aspect
 @Component
 public class RetryOnFailureAspect {

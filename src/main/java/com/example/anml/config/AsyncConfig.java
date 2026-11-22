@@ -11,9 +11,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 
-/**
- * Конфігурація асинхронної обробки з явно обмеженим пулом потоків.
- */
 @Configuration
 @EnableAsync
 public class AsyncConfig implements AsyncConfigurer {

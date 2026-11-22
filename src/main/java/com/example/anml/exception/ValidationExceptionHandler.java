@@ -10,9 +10,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Обробник помилок Bean Validation для формування зрозумілої відповіді HTTP 400.
- */
 @RestControllerAdvice
 public class ValidationExceptionHandler {
 

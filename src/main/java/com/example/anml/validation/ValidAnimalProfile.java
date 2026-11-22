@@ -9,11 +9,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * Перевіряє біологічну узгодженість профілю тварини:
- * відповідність віку реалістичній тривалості життя виду
- * та сумісність виду з обраним середовищем проживання.
- */
 @Documented
 @Constraint(validatedBy = AnimalProfileValidator.class)
 @Target(ElementType.TYPE)

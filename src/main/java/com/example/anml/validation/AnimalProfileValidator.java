@@ -7,10 +7,6 @@ import jakarta.validation.ConstraintValidatorContext;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * Валідатор для {@link ValidAnimalProfile}, що перевіряє міжпольові бізнес-правила
- * для {@link AnimalDto}: реалістичність віку та сумісність виду з середовищем проживання.
- */
 public class AnimalProfileValidator implements ConstraintValidator<ValidAnimalProfile, AnimalDto> {
 
     private static final int DEFAULT_MAX_AGE = 150;

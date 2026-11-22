@@ -42,7 +42,6 @@ class RateLimitAspectTest {
 
         assertTrue(ex.getMessage().contains("test-limit"));
         assertTrue(ex.getMessage().contains("2"));
-        // На 3-му виклику proceed() НЕ викликається
         verify(joinPoint, times(2)).proceed();
     }
 
@@ -56,7 +55,6 @@ class RateLimitAspectTest {
         aspect.enforceRateLimit(joinPoint, annotation);
         aspect.enforceRateLimit(joinPoint, annotation);
 
-        // Зсуваємо час за межі 10-секундного вікна
         clock.advanceSeconds(11);
 
         Object result = aspect.enforceRateLimit(joinPoint, annotation);

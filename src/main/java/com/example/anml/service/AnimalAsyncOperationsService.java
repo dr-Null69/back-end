@@ -16,12 +16,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 
-/**
- * 3 повільні доменні операції, винесені в асинхронне виконання на власному пулі потоків:
- * 1) Fire-and-forget сповіщення доглядачів (void);
- * 2) Запит до ветеринарного сервісу (CompletableFuture);
- * 3) Генерація звіту щодо середовища проживання (CompletableFuture).
- */
 @Service
 public class AnimalAsyncOperationsService {
 
@@ -42,9 +36,6 @@ public class AnimalAsyncOperationsService {
         return defaultDelayMs;
     }
 
-    /**
-     * Повільна операція №1 — «Запустив і забув» (Fire-and-forget).
-     */
     @Async(AsyncConfig.ANIMAL_TASK_EXECUTOR)
     public void sendKeeperNotification(AnimalDto animal,
                                        long delayMs,
@@ -71,9 +62,6 @@ public class AnimalAsyncOperationsService {
         }
     }
 
-    /**
-     * Повільна операція №2 — асинхронний запит до ветеринарного сервісу.
-     */
     @Async(AsyncConfig.ANIMAL_TASK_EXECUTOR)
     public CompletableFuture<VeterinaryCheckDto> fetchVeterinaryStatus(Long animalId,
                                                                        long delayMs,
@@ -95,9 +83,6 @@ public class AnimalAsyncOperationsService {
         return CompletableFuture.completedFuture(dto);
     }
 
-    /**
-     * Повільна операція №3 — асинхронна генерація звіту про стан середовища проживання.
-     */
     @Async(AsyncConfig.ANIMAL_TASK_EXECUTOR)
     public CompletableFuture<HabitatReportDto> fetchHabitatReport(String habitat,
                                                                   long delayMs,

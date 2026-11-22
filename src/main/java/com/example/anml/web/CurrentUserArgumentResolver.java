@@ -13,9 +13,6 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import java.security.Principal;
 import java.util.List;
 
-/**
- * Резолвер аргументів Spring MVC для параметрів, позначених {@link CurrentUser}.
- */
 public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override

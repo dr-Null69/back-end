@@ -12,10 +12,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * Композитна анотація, що об'єднує {@link RequestMapping} (POST) та {@link ResponseStatus}
- * зі статусом {@link HttpStatus#CREATED} для ендпоінтів створення ресурсів.
- */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

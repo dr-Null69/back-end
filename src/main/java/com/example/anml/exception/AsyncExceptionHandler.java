@@ -10,10 +10,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.Map;
 
-/**
- * Цілеспрямована обробка помилок переповнення пулу потоків і тайм-аутів,
- * щоб вони не перетворювались на випадкову помилку HTTP 500.
- */
 @RestControllerAdvice
 public class AsyncExceptionHandler {
 

@@ -66,7 +66,6 @@ class AnimalServiceAopProxyTest {
         when(animalRepository.findById(1L)).thenReturn(Optional.of(entity));
         when(animalMapper.toDto(entity)).thenReturn(rawDto);
 
-        // Зовнішній виклик через Spring-проксі -> аспект СПРАЦЬОВУЄ
         AnimalDto result = animalService.findById(1L);
 
         assertEquals("Сімба король", result.name());
@@ -81,7 +80,6 @@ class AnimalServiceAopProxyTest {
         when(animalRepository.findById(1L)).thenReturn(Optional.of(entity));
         when(animalMapper.toDto(entity)).thenReturn(rawDto);
 
-        // Внутрішній виклик this.findById(1L) оминає проксі -> аспект НАВМИСНО НЕ СПРАЦЬОВУЄ
         AnimalDto result = animalService.findByIdViaSelfInvocation(1L);
 
         assertEquals("  сімба   король  ", result.name());
@@ -114,7 +112,6 @@ class AnimalServiceAopProxyTest {
         assertEquals(7L, animalService.count());
 
         assertThrows(RateLimitExceededException.class, () -> animalService.count());
-        // 4-й виклик заблоковано аспектом до входу в AnimalService#count()
         verify(animalRepository, times(3)).count();
     }
 }

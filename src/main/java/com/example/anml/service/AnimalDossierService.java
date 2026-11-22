@@ -17,13 +17,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-/**
- * Сервіс-оркестратор асинхронних операцій для тварин:
- * - неблокуючий fire-and-forget запуск сповіщення;
- * - паралельний запуск 2 повільних операцій та об'єднання через thenCombine;
- * - стійка обробка збоїв через exceptionally та handle;
- * - явне обмеження часу очікування (тайм-аут).
- */
 @Service
 public class AnimalDossierService {
 
@@ -42,9 +35,6 @@ public class AnimalDossierService {
         this.defaultTimeoutMs = defaultTimeoutMs;
     }
 
-    /**
-     * Запускає повільне сповіщення доглядачів у режимі fire-and-forget і одразу повертає керування.
-     */
     public AnimalDto notifyKeepersAboutAnimal(Long animalId) {
         return notifyKeepersAboutAnimal(
                 animalId,
@@ -63,10 +53,6 @@ public class AnimalDossierService {
         return animal;
     }
 
-    /**
-     * Паралельно запускає перевірку ветеринара та генерацію звіту середовища,
-     * об'єднує результати через thenCombine з обробкою помилок і тайм-аутом.
-     */
     public AnimalDossierDto buildAnimalDossier(Long animalId) {
         long delay = asyncOperationsService.getDefaultDelayMs();
         return buildAnimalDossier(animalId, delay, delay, false, false, defaultTimeoutMs);
@@ -80,7 +66,6 @@ public class AnimalDossierService {
                                                long timeoutMs) {
         AnimalDto animal = animalService.findById(animalId);
 
-        // Запускаємо обидва @Async методи одночасно, не чекаючи завершення першого
         CompletableFuture<VeterinaryCheckDto> vetFuture = asyncOperationsService
                 .fetchVeterinaryStatus(animal.id(), vetDelayMs, simulateVetFailure)
                 .exceptionally(ex -> {

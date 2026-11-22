@@ -15,9 +15,6 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Аспект, який контролює частоту викликів методів, позначених {@link RateLimit}.
- */
 @Aspect
 @Component
 public class RateLimitAspect {

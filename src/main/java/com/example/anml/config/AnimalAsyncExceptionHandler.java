@@ -10,9 +10,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-/**
- * Обробник необроблених винятків для @Async методів із типом повернення void.
- */
 @Component
 public class AnimalAsyncExceptionHandler implements AsyncUncaughtExceptionHandler {
 

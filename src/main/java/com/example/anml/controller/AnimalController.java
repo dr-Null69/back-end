@@ -48,7 +48,6 @@ public class AnimalController {
         animalService.delete(id);
     }
 
-    // Ендпоінт, доступ до якого обмежено на рівні SecurityFilterChain (Acceptance Criteria 6)
     @GetMapping("/admin/stats")
     public Map<String, Object> getAdminStats(@CurrentUser CurrentUserInfo currentUser) {
         return Map.of(
@@ -59,7 +58,6 @@ public class AnimalController {
         );
     }
 
-    // Допоміжний ендпоінт для UI, щоб показати ім'я користувача та його ролі
     @GetMapping("/me")
     public Map<String, Object> getCurrentUser(@CurrentUser CurrentUserInfo currentUser) {
         return Map.of(

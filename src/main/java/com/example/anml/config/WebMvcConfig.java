@@ -8,9 +8,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
 
-/**
- * Конфігурація Spring MVC, що реєструє кастомний резолвер аргументів {@link CurrentUserArgumentResolver}.
- */
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 

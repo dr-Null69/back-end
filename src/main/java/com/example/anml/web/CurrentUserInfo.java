@@ -2,9 +2,6 @@ package com.example.anml.web;
 
 import java.util.List;
 
-/**
- * Модель даних поточного користувача, що резолвиться за допомогою {@link CurrentUser}.
- */
 public record CurrentUserInfo(
         boolean authenticated,
         String username,

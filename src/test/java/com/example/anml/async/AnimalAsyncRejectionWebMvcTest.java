@@ -80,7 +80,6 @@ class AnimalAsyncRejectionWebMvcTest {
         waitUntilExecutorIdle();
     }
 
-    // Сценарій 6 (через HTTP): переповнення малого пулу повертає HTTP 503 із чітким повідомленням, а не 500
     @Test
     @WithMockUser(username = "user1", roles = "USER")
     void whenTinyExecutorIsSaturated_httpEndpointReturns503WithClearMessageInsteadOf500() throws Exception {
@@ -89,11 +88,9 @@ class AnimalAsyncRejectionWebMvcTest {
         assertEquals(1, tinyExecutor.getQueueCapacity());
 
         CountDownLatch activeAndQueuedLatch = new CountDownLatch(2);
-        // Займаємо 1 активний потік і 1 єдине місце в черзі
         animalDossierService.notifyKeepersAboutAnimal(1L, 500, false, activeAndQueuedLatch);
         animalDossierService.notifyKeepersAboutAnimal(1L, 500, false, activeAndQueuedLatch);
 
-        // 3-тє завдання переповнює виконавець -> TaskRejectedException -> AsyncExceptionHandler -> HTTP 503
         mockMvc.perform(post("/api/animals/1/notify").with(csrf()))
                 .andExpect(status().isServiceUnavailable())
                 .andExpect(jsonPath("$.status").value(503))
@@ -103,7 +100,6 @@ class AnimalAsyncRejectionWebMvcTest {
         assertTrue(activeAndQueuedLatch.await(5, TimeUnit.SECONDS));
     }
 
-    // Сценарій 6 (прямий виклик): переповнення малого пулу явно кидає TaskRejectedException
     @Test
     void whenTinyExecutorIsSaturated_directSubmissionThrowsTaskRejectedException() throws Exception {
         CountDownLatch activeAndQueuedLatch = new CountDownLatch(2);
@@ -119,7 +115,6 @@ class AnimalAsyncRejectionWebMvcTest {
         assertTrue(activeAndQueuedLatch.await(5, TimeUnit.SECONDS));
     }
 
-    // Перевірка штатної роботи контролера, коли пул не перевантажений
     @Test
     @WithMockUser(username = "user1", roles = "USER")
     void whenExecutorHasCapacity_notifyEndpointReturns202Accepted() throws Exception {
