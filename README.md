@@ -40,3 +40,23 @@
    - QuartzConfigurationAndLiquibaseTest — перевіряє JobDetail/Trigger, JobKey, пріоритет JobDataMap тригера, misfire instruction, TimeZone і Liquibase QRTZ_* + initialize-schema: never.
    - QuartzJobsTest — перевіряє делегування в сервіс і @Transactional, помилкові/відсутні ключі JobDataMap, @DisallowConcurrentExecution і обробку збоїв.
    - AnimalMaintenanceServiceIdempotencyTest — перевіряє ідемпотентність обох методів сервісу.
+
+
+Лабораторна робота — Multi-module Maven
+
+1. Кореневий POM (pom.xml)
+   - Задано packaging=pom та секцію modules: common, animal-catalog-service, animal-dossier-service.
+   - Спільну для всіх модулів залежність spring-boot-starter-test винесено в кореневий dependencies і прибрано з дочірніх модулів.
+   - Кожен дочірній модуль посилається на кореневий POM через parent (com.example:anml).
+
+2. Модуль common
+   - Містить лише спільні DTO (AnimalDto, AnimalDossierDto, HabitatReportDto, VeterinaryCheckDto) і валідацію (ValidAnimalProfile, AnimalProfileValidator), без main-класу та без spring-boot-maven-plugin.
+
+3. Незалежні сервіси
+   - animal-catalog-service (порт 8080) — AnimalCatalogApplication, власний application.yml, spring-boot-maven-plugin, Dockerfile, основний функціонал (CRUD, Security, AOP, Quartz, Liquibase) і 55 тестів.
+   - animal-dossier-service (порт 8082) — AnimalDossierApplication, власний application.yml, spring-boot-maven-plugin, Dockerfile, асинхронна обробка досьє/сповіщень, HTTP-клієнт AnimalCatalogClient (RestClient) замість прямої залежності на AnimalService і 9 тестів.
+
+4. Перевірка
+   - mvn verify з кореня успішно збирає всі 3 модулі, запускає 64 тести (55 + 9) і формує окремі Spring Boot JAR для кожного сервісу.
+   - mvn dependency:tree підтверджує відсутність залежностей між сервісами (спільним є лише модуль common).
+
